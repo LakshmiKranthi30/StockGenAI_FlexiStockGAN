@@ -13,6 +13,9 @@ to generate realistic multi-step stock price forecasts using a **GRU-based Gener
 
 The implementation is designed for **research reproducibility, experimentation, and extension toward standard financial forecasting studies.**
 
+Archived Release (Zenodo)
+
+https://doi.org/10.5281/zenodo.20846812
 ---
 
 # Project Overview
