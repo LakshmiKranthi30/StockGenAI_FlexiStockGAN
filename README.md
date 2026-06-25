@@ -1,102 +1,542 @@
-# StockGenAI / FlexiStockGAN
+# StockGenAI: FlexiStockGAN for Multi-Source Stock Price Forecasting
 
-Complete runnable implementation of **FlexiStockGAN**, a multi-source adversarial deep learning framework for stock price forecasting.
+StockGenAI is a complete Python implementation of **FlexiStockGAN**, a multi-source adversarial deep learning framework for stock price forecasting.
 
-The project implements:
+The framework integrates:
 
-- Yahoo Finance / synthetic stock data loading
-- Market index feature loading
-- Technical indicator engineering
-- Optional news sentiment fusion from CSV
-- Chronological train/validation/test split
-- Training-only winsorization and Min-Max scaling to avoid data leakage
-- Sliding-window forecasting dataset
-- GRU generator + 1D-CNN WGAN-GP critic
-- Optional generator-only ablation
-- SVR, GRU, and LSTM baselines
-- RMSE, MAE, Directional Accuracy, and KL Divergence
-- Prediction CSVs, metric CSVs, trained model files, and figures
+* Historical stock prices
+* Technical indicators
+* Optional market index features
+* Optional financial news sentiment
 
-## 1. Install
+to generate realistic multi-step stock price forecasts using a **GRU-based Generator** and a **1D-CNN WGAN-GP Critic**.
+
+The implementation is designed for **research reproducibility, experimentation, and extension toward standard financial forecasting studies.**
+
+---
+
+# Project Overview
+
+Financial stock price forecasting is a highly nonlinear time-series learning problem influenced by:
+
+* Historical market behavior
+* Technical trading indicators
+* Market-wide conditions
+* Investor sentiment
+
+Traditional forecasting models generally produce deterministic point estimates and often fail to model uncertainty during volatile market conditions.
+
+StockGenAI addresses this limitation through a **GAN-based forecasting framework** where:
+
+* A GRU Generator learns temporal dependencies from fused financial features.
+* A CNN Critic evaluates whether generated future price sequences resemble real market behavior.
+* WGAN-GP optimization stabilizes adversarial training.
+* A supervised forecasting loss improves numerical prediction accuracy.
+
+---
+
+# Key Features
+
+* Yahoo Finance stock data loading using `yfinance`
+* Offline demo mode (no Internet required)
+* Technical indicator generation
+* Optional sentiment feature integration
+* Chronological train/validation/test split
+* Leakage-safe preprocessing
+* Sliding window sequence generation
+* GRU Generator
+* 1D CNN WGAN-GP Critic
+* Multi-step stock forecasting
+* Baseline models:
+
+  * SVR
+  * LSTM
+  * GRU
+* Ablation study support
+* Evaluation metrics:
+
+  * RMSE
+  * MAE
+  * Directional Accuracy
+  * KL Divergence
+* Automatic result saving
+* Publication-ready figures
+
+---
+
+# Repository Structure
+
+```text
+StockGenAI_FlexiStockGAN/
+│
+├── main.py
+├── requirements.txt
+├── README.md
+├── how_to_run.txt
+│
+├── src/
+│   ├── config.py
+│   ├── data_loader.py
+│   ├── feature_engineering.py
+│   ├── sentiment_extraction.py
+│   ├── dataset.py
+│   ├── models.py
+│   ├── train_gan.py
+│   ├── evaluate.py
+│   ├── baselines.py
+│   ├── plots.py
+│   └── utils.py
+│
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   └── news/
+│
+└── outputs/
+    ├── models/
+    ├── predictions/
+    ├── metrics/
+    └── figures/
+```
+
+---
+
+# Methodology
+
+The complete forecasting pipeline consists of five stages.
+
+## Stage 1 – Data Collection
+
+Historical OHLCV stock data are collected from Yahoo Finance.
+
+Optional inputs include:
+
+* Market index data
+* Financial news sentiment
+
+---
+
+## Stage 2 – Feature Engineering
+
+Technical indicators are computed, including:
+
+* Daily Returns
+* Moving Averages
+* RSI
+* MACD
+* Bollinger Bands
+* Historical Volatility
+* Volume Indicators
+
+Daily sentiment scores are aligned with trading dates.
+
+---
+
+## Stage 3 – Data Fusion
+
+The following features are merged into one feature matrix:
+
+* OHLCV
+* Technical Indicators
+* Market Index Features
+* Sentiment Features
+
+Data preprocessing includes:
+
+* Missing value handling
+* Training-only normalization
+* Data leakage prevention
+
+---
+
+## Stage 4 – GAN Forecasting
+
+The GRU Generator predicts future Close-price sequences.
+
+The CNN Critic distinguishes:
+
+* Real future price sequences
+* Generated future price sequences
+
+Training is performed using:
+
+* Wasserstein GAN
+* Gradient Penalty (WGAN-GP)
+
+---
+
+## Stage 5 – Evaluation
+
+Predictions are evaluated using:
+
+* RMSE
+* MAE
+* Directional Accuracy
+* KL Divergence
+
+Figures and CSV files are automatically generated.
+
+---
+
+# Installation
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/your-username/StockGenAI_FlexiStockGAN.git
+
+cd StockGenAI_FlexiStockGAN
+```
+
+---
+
+## 2. Create Virtual Environment
+
+Windows
+
+```bash
+python -m venv venv
+
+venv\Scripts\activate
+```
+
+Linux/macOS
+
+```bash
+python -m venv venv
+
+source venv/bin/activate
+```
+
+---
+
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-## 2. Quick Offline Demo
+---
 
-Runs without internet using synthetic stock and index data:
-
-```bash
-python main.py --demo --ticker AAPL --horizon 5 --epochs 5 --critic_steps 1
-```
-
-## 3. Real Data Run
-
-Uses `yfinance` to download OHLCV and market index data:
+# Quick Demo
 
 ```bash
-python main.py --ticker AAPL --start 2010-01-01 --end 2022-12-31 --horizon 5 --epochs 80 --critic_steps 5
+python main.py \
+--demo \
+--ticker AAPL \
+--horizon 5 \
+--epochs 5 \
+--critic_steps 1
 ```
 
-## 4. Run with Baselines
+This generates synthetic stock-like data for a quick demonstration.
+
+---
+
+# Full Research Experiment
 
 ```bash
-python main.py --ticker AAPL --horizon 5 --epochs 80 --critic_steps 5 --run_baselines
+python main.py \
+--ticker AAPL \
+--start 2010-01-01 \
+--end 2022-12-31 \
+--horizon 5 \
+--epochs 80 \
+--critic_steps 5 \
+--run_baselines
 ```
 
-## 5. Multi-Horizon Runs
+Example:
 
 ```bash
-python main.py --ticker AAPL --horizon 1 --epochs 80
-python main.py --ticker AAPL --horizon 5 --epochs 80
-python main.py --ticker AAPL --horizon 10 --epochs 80
-python main.py --ticker AAPL --horizon 20 --epochs 80
+python main.py \
+--ticker MSFT \
+--start 2010-01-01 \
+--end 2022-12-31 \
+--horizon 10 \
+--epochs 100 \
+--critic_steps 5 \
+--run_baselines
 ```
 
-## 6. Ablation Studies
+---
+
+# Command Line Arguments
+
+| Argument          | Description           | Default    |
+| ----------------- | --------------------- | ---------- |
+| `--ticker`        | Stock ticker          | AAPL       |
+| `--start`         | Start date            | 2010-01-01 |
+| `--end`           | End date              | 2022-12-31 |
+| `--window`        | Input sequence length | 30         |
+| `--horizon`       | Forecast horizon      | 5          |
+| `--epochs`        | Training epochs       | 50         |
+| `--batch_size`    | Batch size            | 32         |
+| `--critic_steps`  | Critic updates        | 5          |
+| `--demo`          | Offline demo mode     | Disabled   |
+| `--run_baselines` | Evaluate baselines    | Disabled   |
+| `--ablation`      | Ablation mode         | None       |
+
+---
+
+# Supported Forecast Horizons
+
+* 1-Day Ahead
+* 5-Day Ahead
+* 10-Day Ahead
+* 20-Day Ahead
+
+Example:
 
 ```bash
-python main.py --ticker AAPL --horizon 5 --ablation no_sentiment
-python main.py --ticker AAPL --horizon 5 --ablation no_technical
-python main.py --ticker AAPL --horizon 5 --ablation no_indices
-python main.py --ticker AAPL --horizon 5 --ablation generator_only
+python main.py --ticker AAPL --horizon 20 --epochs 100
 ```
 
-## 7. News Sentiment CSV Format
+---
 
-Use a CSV with the following columns:
+# Ablation Study
 
-```csv
-date,headline,summary,source
-2020-01-03,Apple stock rises after strong demand,Analysts report strong iPhone demand,Yahoo
-2020-01-04,Market volatility increases,Investors respond to macro uncertainty,News
-```
-
-Run:
+Examples
 
 ```bash
-python main.py --ticker AAPL --news_csv data/news/news.csv --horizon 5
+python main.py --ticker AAPL --ablation no_sentiment
 ```
 
-If no news file is provided, the code uses a deterministic synthetic sentiment sequence for reproducible demonstration.
+```bash
+python main.py --ticker AAPL --ablation no_technical
+```
 
-## 8. Outputs
+```bash
+python main.py --ticker AAPL --ablation generator_only
+```
 
-After execution, results are saved in:
+| Mode           | Description                 |
+| -------------- | --------------------------- |
+| no_sentiment   | Remove sentiment features   |
+| no_technical   | Remove technical indicators |
+| generator_only | Disable adversarial critic  |
+
+---
+
+# Model Architecture
+
+## Generator
 
 ```text
-outputs/models/       trained PyTorch model and scaler
-outputs/predictions/  predicted and true values
-outputs/metrics/      metric CSV and training history
-outputs/figures/      actual-vs-predicted, error, return-distribution, and loss plots
+Input Sequence
+      │
+      ▼
+GRU Layer
+      │
+      ▼
+GRU Layer
+      │
+      ▼
+Dense Layer
+      │
+      ▼
+Dropout
+      │
+      ▼
+Forecast Output
 ```
 
-## 9. Important Methodological Decisions
+---
 
-- WGAN-GP uses a critic with linear output, not sigmoid.
-- The generator loss combines adversarial loss and MAE supervision for better forecasting accuracy.
-- Scaling and winsorization parameters are fitted only on training data.
-- News sentiment is aligned by trading date and forward-filled if absent.
-- Chronological splitting is used to preserve temporal integrity.
+## Critic
 
+```text
+Real / Generated Sequence
+          │
+          ▼
+Conv1D
+          │
+          ▼
+LeakyReLU
+          │
+          ▼
+Conv1D
+          │
+          ▼
+LeakyReLU
+          │
+          ▼
+Conv1D
+          │
+          ▼
+LeakyReLU
+          │
+          ▼
+Flatten
+          │
+          ▼
+Dense
+          │
+          ▼
+Dense
+          │
+          ▼
+Linear Critic Score
+```
+
+---
+
+# Evaluation Metrics
+
+## RMSE
+
+Measures overall prediction error while penalizing large deviations.
+
+---
+
+## MAE
+
+Measures the average absolute forecasting error.
+
+---
+
+## Directional Accuracy
+
+Measures whether the model correctly predicts market movement direction.
+
+---
+
+## KL Divergence
+
+Measures similarity between generated and real return distributions.
+
+---
+
+# Output Files
+
+```text
+outputs/
+
+├── models/
+│   ├── generator.pt
+│   └── critic.pt
+│
+├── predictions/
+│   └── predictions.csv
+│
+├── metrics/
+│   └── metrics.csv
+│
+└── figures/
+    ├── actual_vs_predicted.png
+    ├── error_distribution.png
+    ├── real_vs_generated_distribution.png
+    └── training_losses.png
+```
+
+---
+
+# Custom Sentiment Data
+
+Store CSV files inside
+
+```text
+data/news/
+```
+
+Example
+
+```csv
+date,headline,summary,sentiment
+
+2020-01-03,Apple rises after strong demand,Positive earnings outlook,0.64
+
+2020-01-04,Market uncertainty increases,Investors remain cautious,-0.32
+```
+
+Missing trading-day sentiment values may be:
+
+* Forward-filled
+* Assigned a neutral value of **0**
+
+---
+
+# Reproducibility
+
+Recommended settings
+
+* Random Seeds
+
+```
+42
+52
+62
+72
+82
+```
+
+* Chronological split
+* Window size = 30
+* Forecast horizons = 1,5,10,20
+* Critic updates = 5
+* Gradient penalty = 10
+
+---
+
+# Recommended Experimental Protocol
+
+1. Evaluate multiple stock tickers.
+2. Compare 1, 5, 10, and 20-day forecasts.
+3. Compare against:
+
+   * SVR
+   * LSTM
+   * GRU
+   * Transformer
+4. Conduct ablation studies.
+5. Report:
+
+   * RMSE
+   * MAE
+   * Directional Accuracy
+   * KL Divergence
+6. Plot:
+
+   * Actual vs Predicted
+   * Distribution Comparison
+7. Repeat experiments across multiple random seeds.
+
+---
+
+# Limitations
+
+* Intended for academic and research purposes.
+* Stock forecasting is inherently uncertain.
+* Predictions should **not** be interpreted as investment or financial advice.
+* Performance depends on market conditions, feature quality, selected stocks, and random initialization.
+
+---
+
+# Future Work
+
+* FinBERT Sentiment Extraction
+* FRED Macroeconomic Features
+* Transformer Generator
+* Temporal Fusion Transformer
+* N-BEATS
+* Multi-stock Portfolio Forecasting
+* Probabilistic Confidence Intervals
+* Trading Backtesting
+* SHAP Explainability
+* Attention Visualization
+
+---
+
+# Disclaimer
+
+This repository is provided exclusively for educational and research purposes.
+
+It does **not** constitute financial, trading, or investment advice.
+
+Users are responsible for independently validating all experimental results before applying them in real-world financial scenarios.
+
+---
+
+# License
+
+This project may be released under the **MIT License** (or another suitable open-source license selected by the repository owner).
