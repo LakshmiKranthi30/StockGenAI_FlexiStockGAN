@@ -526,7 +526,49 @@ Recommended settings
 * Attention Visualization
 
 ---
+---
 
+# DOI and Citation
+
+This repository has been archived on **Zenodo** to ensure long-term preservation and reproducibility.
+
+**DOI:** https://doi.org/10.5281/zenodo.20846812
+
+You can cite this software using the DOI above.
+
+---
+
+# Citation
+
+If you use this repository in your research, please cite both the software repository and the archived Zenodo release.
+
+## BibTeX
+
+```bibtex
+@software{LakshmiKranthi2026,
+  author       = {Lakshmi Kranthi},
+  title        = {StockGenAI: FlexiStockGAN for Multi-Source Stock Price Forecasting},
+  year         = {2026},
+  publisher    = {Zenodo},
+  version      = {v1},
+  doi          = {10.5281/zenodo.20846812},
+  url          = {https://doi.org/10.5281/zenodo.20846812}
+}
+```
+
+---
+
+# Repository
+
+GitHub Repository
+
+https://github.com/LakshmiKranthi30/StockGenAI_FlexiStockGAN
+
+Archived Release (Zenodo)
+
+https://doi.org/10.5281/zenodo.20846812
+
+---
 # Disclaimer
 
 This repository is provided exclusively for educational and research purposes.
