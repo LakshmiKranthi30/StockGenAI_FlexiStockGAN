@@ -1,0 +1,28 @@
+HOW TO RUN STOCKGENAI / FLEXISTOCKGAN
+
+1. Open terminal in the project folder:
+   cd StockGenAI_FlexiStockGAN
+
+2. Install dependencies:
+   pip install -r requirements.txt
+
+3. Run quick offline demo:
+   python main.py --demo --ticker AAPL --horizon 5 --epochs 5 --critic_steps 1
+
+4. Run real Yahoo Finance experiment:
+   python main.py --ticker AAPL --start 2010-01-01 --end 2022-12-31 --horizon 5 --epochs 80 --critic_steps 5
+
+5. Run with baselines:
+   python main.py --ticker AAPL --horizon 5 --epochs 80 --run_baselines
+
+6. Run ablation studies:
+   python main.py --ticker AAPL --horizon 5 --ablation no_sentiment
+   python main.py --ticker AAPL --horizon 5 --ablation no_technical
+   python main.py --ticker AAPL --horizon 5 --ablation no_indices
+   python main.py --ticker AAPL --horizon 5 --ablation generator_only
+
+7. Outputs are saved in:
+   outputs/models
+   outputs/predictions
+   outputs/metrics
+   outputs/figures
