@@ -100,14 +100,3 @@ outputs/figures/      actual-vs-predicted, error, return-distribution, and loss 
 - News sentiment is aligned by trading date and forward-filled if absent.
 - Chronological splitting is used to preserve temporal integrity.
 
-## 10. Suggested SCI-Quality Experimental Protocol
-
-Run five independent seeds and all horizons:
-
-```bash
-for seed in 1 2 3 4 5; do
-  for h in 1 5 10 20; do
-    python main.py --ticker AAPL --horizon $h --epochs 300 --seed $seed --critic_steps 5 --run_baselines
-  done
-done
-```
